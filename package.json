@@ -1,0 +1,14 @@
+{
+  "name": "tw-stock-research",
+  "version": "1.0.0",
+  "description": "台股自動化交易研究系統",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "latest",
+    "express": "^4.21.2"
+  }
+}

@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>台股交易研究室</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<script src="https://unpkg.com/lightweight-charts@4.2.0/dist/lightweight-charts.standalone.production.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.6/dist/purify.min.js"></script>
+</head>
+<body>
+<div class="app">
+  <aside class="nav">
+    <div class="brand"><span class="logo">台</span><div><b>台股交易研究室</b><small>Automated TW Equity Research</small></div></div>
+    <nav id="menu">
+      <a data-tab="ideas" class="active"><i>01</i>交易點子生成器</a>
+      <a data-tab="technical"><i>02</i>自動化技術分析</a>
+      <a data-tab="news"><i>03</i>新聞轉交易策略</a>
+      <a data-tab="backtest"><i>04</i>策略回測分析</a>
+      <a data-tab="portfolio"><i>05</i>投資組合風險管理</a>
+      <a data-tab="journal"><i>06</i>交易日誌分析</a>
+      <a data-tab="plan"><i>07</i>全自動交易計畫</a>
+    </nav>
+    <div class="nav-foot">
+      <label class="switch"><input type="checkbox" id="aiToggle" checked><span></span>Claude AI 深度解讀</label>
+      <div id="aiStatus" class="muted small"></div>
+      <p class="muted small">資料來源：Yahoo Finance、TWSE/TPEx OpenAPI、Google 新聞。本系統為研究輔助工具，非投資建議。</p>
+    </div>
+  </aside>
+
+  <main>
+    <!-- 1 -->
+    <section id="tab-ideas" class="tab active">
+      <header><h1>交易點子生成器</h1><p>掃描今日市場，針對指定股票／指數／產業產生五組高勝率交易機會，含進場、出場目標、停損、風險報酬比，以及技術面與基本面理由。</p></header>
+      <form class="bar" data-api="ideas">
+        <input name="target" list="industryList" placeholder="例：半導體、航運、加權指數、2330,2317,2454" value="加權指數">
+        <datalist id="industryList"></datalist>
+        <button>開始掃描</button>
+      </form>
+      <div class="chips" id="industryChips"></div>
+      <div class="out"></div>
+    </section>
+
+    <!-- 2 -->
+    <section id="tab-technical" class="tab">
+      <header><h1>自動化技術分析</h1><p>以日線與週線拆解支撐壓力、趨勢線、移動平均線與動能指標，逐步產生買進／持有／賣出訊號與理由。</p></header>
+      <form class="bar" data-api="technical">
+        <input name="symbol" placeholder="股票代號或名稱，例：2330、聯發科、加權指數" value="2330">
+        <button>分析</button>
+      </form>
+      <div class="out"></div>
+    </section>
+
+    <!-- 3 -->
+    <section id="tab-news" class="tab">
+      <header><h1>新聞轉交易策略</h1><p>整理公司或產業最近 30 天新聞，轉化為短期與長期交易影響、預期價格波動區間與建議部位配置。</p></header>
+      <form class="bar" data-api="news">
+        <input name="query" placeholder="公司或產業，例：台積電、鴻海、航運、AI 伺服器" value="台積電">
+        <input name="capital" type="number" class="sm" value="1000000" title="可投入資金">
+        <button>分析新聞</button>
+      </form>
+      <div class="out"></div>
+    </section>
+
+    <!-- 4 -->
+    <section id="tab-backtest" class="tab">
+      <header><h1>策略回測分析</h1><p>在指定標的的歷史資料上回測交易策略，呈現勝率、獲利因子、最大回撤，並自動測試可提高策略優勢的改進方向。</p></header>
+      <form class="bar wrap" data-api="backtest">
+        <input name="symbol" placeholder="股票／指數" value="2330">
+        <select name="strategy" id="stratSelect"></select>
+        <select name="years"><option value="1">過去 1 年</option><option value="3">過去 3 年</option><option value="5" selected>過去 5 年</option><option value="10">過去 10 年</option><option value="15">過去 15 年</option></select>
+        <span id="paramBox" class="params"></span>
+        <details class="opts"><summary>出場／濾網</summary>
+          <label>停損 % <input name="stopLoss" type="number" class="xs" placeholder="無"></label>
+          <label>停利 % <input name="takeProfit" type="number" class="xs" placeholder="無"></label>
+          <label>ATR 移動停損倍數 <input name="atrTrail" type="number" step="0.5" class="xs" placeholder="無"></label>
+          <label><input type="checkbox" name="trendFilter"> 趨勢濾網</label>
+          <label><input type="checkbox" name="volFilter"> 量能濾網</label>
+          <label><input type="checkbox" name="adxFilter"> ADX 濾網</label>
+        </details>
+        <button>執行回測</button>
+      </form>
+      <div class="out"></div>
+    </section>
+
+    <!-- 5 -->
+    <section id="tab-portfolio" class="tab">
+      <header><h1>投資組合風險管理</h1><p>分析持股弱點、過度曝險與隱藏相關性，提出符合風險承受度的平衡方案，以及大盤下跌 20% 的避險策略。</p></header>
+      <form class="stack" data-api="portfolio">
+        <textarea name="holdings" rows="3" placeholder="代號 比例，以逗號或換行分隔">2330 40%, 2317 20%, 2454 15%, 0050 15%, 2882 10%</textarea>
+        <div class="bar">
+          <select name="profile"><option>保守</option><option selected>穩健</option><option>積極</option></select>
+          <input name="value" type="number" class="sm" value="1000000" title="組合市值">
+          <button>分析組合</button>
+        </div>
+      </form>
+      <div class="out"></div>
+    </section>
+
+    <!-- 6 -->
+    <section id="tab-journal" class="tab">
+      <header><h1>交易日誌分析</h1><p>檢視最近 20 筆交易，找出反覆出現的錯誤、錯失的機會與行為偏誤，並提供 3 條個人化規則。</p></header>
+      <form class="stack" data-api="journal">
+        <div class="muted small">每行一筆：<code>進場日,代號,方向(多/空),進場價,出場日,出場價,股數,停損價(選填),備註(選填)</code></div>
+        <textarea name="journal" rows="9" id="journalBox"></textarea>
+        <div class="bar"><button type="button" class="ghost" id="loadSample">載入範例</button><button>分析日誌</button></div>
+      </form>
+      <div class="out"></div>
+    </section>
+
+    <!-- 7 -->
+    <section id="tab-plan" class="tab">
+      <header><h1>全自動交易計畫</h1><p>依市場或資產產生含時間標記的每日檢查清單：盤前掃描、開盤策略、盤中調整與收盤策略，照表執行。</p></header>
+      <form class="bar" data-api="plan">
+        <input name="asset" placeholder="台股、台指期、2330…" value="台股">
+        <input name="capital" type="number" class="sm" value="1000000" title="資金">
+        <input name="riskPct" type="number" step="0.25" class="xs" value="1" title="單筆風險 %">
+        <button>產生今日計畫</button>
+      </form>
+      <div class="out"></div>
+    </section>
+  </main>
+</div>
+<script src="app.js"></script>
+</body>
+</html>

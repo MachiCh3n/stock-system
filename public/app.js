@@ -38,6 +38,7 @@ $$('#menu a').forEach((a) => a.addEventListener('click', () => {
   $$('#menu a').forEach((x) => x.classList.toggle('active', x === a));
   $$('.tab').forEach((t) => t.classList.toggle('active', t.id === `tab-${a.dataset.tab}`));
   try { localStorage.setItem('tab', a.dataset.tab); } catch {}
+  a.scrollIntoView({ block: 'nearest', inline: 'center' }); // 手機版：選中的模組捲到選單中間
 }));
 try { const t = localStorage.getItem('tab'); if (t) $(`#menu a[data-tab="${t}"]`)?.click(); } catch {}
 
@@ -224,7 +225,7 @@ RENDER.portfolio = (d) => {
     <p class="small muted">方法：目前權重與風險平價（反波動加權）各半混合，套用單一持股上限 ${d.profileLimits.maxName}%，再依目標波動 ${d.profileLimits.targetVol}% 決定股票／現金比例。</p></div>
   <div class="card"><h2>大盤下跌 20% 情境與避險策略</h2>
     <div class="kpis">${kpi('預估組合跌幅', `${h.scenario.expectedLossPct}%`, `約 ${num(h.scenario.expectedLoss, 0)} 元`, 'down')}${kpi('是否在承受範圍', h.scenario.withinTolerance ? '是' : '否', `上限 ${d.profileLimits.maxLoss20}%`, h.scenario.withinTolerance ? '' : 'up')}${kpi('歷史最差 20 日', `${h.historicalStress.portfolioPct}%`, `${h.historicalStress.from}～${h.historicalStress.to} 大盤 ${h.historicalStress.indexPct}%`)}${kpi('加權指數', num(h.indexLevel, 0))}</div>
-    <table><tr><th>避險工具</th><th>執行方式</th><th>成本／取捨</th></tr>${h.options.map((o) => `<tr><td><b>${esc(o.name)}</b></td><td class="small">${esc(o.detail)}</td><td class="small muted">${esc(o.cost)}</td></tr>`).join('')}</table>
+    <table class="stack-sm"><tr><th>避險工具</th><th>執行方式</th><th>成本／取捨</th></tr>${h.options.map((o) => `<tr><td><b>${esc(o.name)}</b></td><td class="small">${esc(o.detail)}</td><td class="small muted">${esc(o.cost)}</td></tr>`).join('')}</table>
     <h3>避險啟動條件</h3><ul class="reasons">${h.triggers.map((t) => `<li>${esc(t)}</li>`).join('')}</ul></div>
   ${aiBlock(d.ai)}`;
 };

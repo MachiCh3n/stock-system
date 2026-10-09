@@ -101,12 +101,71 @@ ul.reasons { margin: 4px 0 0; padding-left: 18px; } ul.reasons li { margin: 2px 
 .switch input:checked + span { background: #7c3aed; } .switch input:checked + span::after { left: 18px; }
 code { font-family: var(--mono); background: var(--panel2); padding: 1px 6px; border-radius: 4px; font-size: 12px; }
 a { color: var(--info); }
+main { min-width: 0; }
+
+/* ---------- 平板 ---------- */
+@media (max-width: 1100px) {
+  .g3 { grid-template-columns: 1fr; }
+  .levels { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+/* ---------- 手機 ---------- */
 @media (max-width: 900px) {
-  .app { grid-template-columns: 1fr; }
-  .nav { position: static; height: auto; }
-  nav#menu { display: flex; overflow-x: auto; gap: 4px; } nav a { white-space: nowrap; }
-  .nav-foot p { display: none; }
-  main { padding: 18px 16px 40px; }
-  .g2, .g3 { grid-template-columns: 1fr; } .levels { grid-template-columns: repeat(2, 1fr); }
+  body { font-size: 15px; }
+  .app { grid-template-columns: minmax(0, 1fr); }
+  /* 頂部固定列：品牌 + AI 開關 + 可橫向滑動的模組選單 */
+  .nav { position: sticky; top: 0; z-index: 20; height: auto; padding: 10px 0 0; border-right: 0; border-bottom: 1px solid var(--line); display: grid; grid-template-columns: 1fr auto; align-items: center; }
+  .brand { margin: 0; padding: 0 16px; gap: 8px; }
+  .brand .logo { width: 30px; height: 30px; font-size: 16px; border-radius: 8px; }
+  .brand small { display: none; }
+  .nav-foot { margin: 0; padding-right: 16px; grid-row: 1; grid-column: 2; }
+  .nav-foot p, #aiStatus { display: none; }
+  .switch { margin: 0; font-size: 12px; }
+  nav#menu { grid-column: 1 / -1; display: flex; gap: 6px; overflow-x: auto; padding: 10px 16px; scrollbar-width: none; -webkit-overflow-scrolling: touch; scroll-snap-type: x proximity; scroll-padding-inline: 16px; }
+  nav#menu::-webkit-scrollbar { display: none; }
+  nav a { white-space: nowrap; flex: none; margin: 0; padding: 6px 12px; border-radius: 99px; background: var(--panel2); font-size: 13px; scroll-snap-align: start; }
+  nav a.active { background: var(--accent); color: #1a1300; box-shadow: none; }
+  nav a.active i { color: #1a1300; }
+
+  main { padding: 16px 16px 48px; }
+  header h1 { font-size: 20px; }
+  header p { font-size: 13px; }
+
+  /* 表單：全寬、16px 字級避免 iOS 自動放大 */
   .bar { flex-wrap: wrap; }
+  .bar > input, .bar > select, .bar > button, .bar input:not(.sm):not(.xs) { flex: 1 1 100%; min-width: 0; width: 100%; }
+  .bar > input.sm, .bar > select { flex: 1 1 40%; }
+  .bar > input.xs { flex: 1 1 20%; width: auto; }
+  input, select, textarea { font-size: 16px; }
+  .params { flex: 1 1 100%; flex-wrap: wrap; }
+  details.opts { flex: 1 1 100%; }
+  button { padding: 11px 18px; }
+  .chips { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
+  .chips::-webkit-scrollbar { display: none; }
+  .chip { flex: none; padding: 5px 12px; }
+
+  /* 卡片與數據 */
+  .card { padding: 14px; border-radius: 10px; }
+  .g2, .g3 { grid-template-columns: minmax(0, 1fr); }
+  .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .kpi { padding: 8px 10px; min-width: 0; }
+  .kpi .v { font-size: 17px; overflow-wrap: anywhere; line-height: 1.35; }
+  .kpi:first-child .v { font-size: 15px; }
+  .levels { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .levels > div:last-child { grid-column: 1 / -1; }
+  .chart { height: 300px; } .chart.sm { height: 220px; }
+
+  /* 表格：不在 .tbl-wrap 內的也能橫向捲動 */
+  table { font-size: 12px; }
+  .card table:not(.tbl-wrap table) { display: block; overflow-x: auto; }
+  th, td { padding: 6px; }
+  /* 避險表：改為卡片式堆疊 */
+  table.stack-sm, table.stack-sm tbody, table.stack-sm tr, table.stack-sm td { display: block; width: 100%; }
+  table.stack-sm tr:first-child { display: none; }
+  table.stack-sm tr { padding: 8px 0; border-bottom: 1px solid var(--line); }
+  table.stack-sm td { border: 0; padding: 2px 0; }
+
+  .checklist .item { grid-template-columns: 22px 46px minmax(0, 1fr); gap: 8px; padding: 10px 0; }
+  .steps li { padding-left: 34px; }
+  .rule { padding: 10px; gap: 10px; }
 }

@@ -78,6 +78,8 @@ $$('form[data-api]').forEach((f) => f.addEventListener('submit', async (e) => {
     body.options = { stopLoss: Number(body.stopLoss) || 0, takeProfit: Number(body.takeProfit) || 0, atrTrail: Number(body.atrTrail) || 0, trendFilter: !!body.trendFilter, volFilter: !!body.volFilter, adxFilter: !!body.adxFilter };
   }
   const btn = $('button:not([type=button])', f); btn.disabled = true;
+  // 免費主機閒置會休眠，首次請求可能要等 30–60 秒，等超過 8 秒就提示使用者
+  const slow = setTimeout(() => { const l = $('.loading', out); if (l) l.insertAdjacentHTML('beforeend', '<div class="small" style="margin-top:8px">伺服器可能剛從休眠中喚醒（免費主機），首次請求會比較久，請再稍候約 1 分鐘…</div>'); }, 8000);
   out.innerHTML = `<div class="loading"><div class="spinner"></div>${$('#aiToggle').checked ? '分析中（含 Claude AI 解讀，約需 30–90 秒）…' : '分析中…'}</div>`;
   try {
     const { data, ms } = await api(key, body);
@@ -85,7 +87,7 @@ $$('form[data-api]').forEach((f) => f.addEventListener('submit', async (e) => {
     RENDER[key].after?.(data, out);
   } catch (err) {
     out.innerHTML = `<div class="err">${esc(err.message)}</div>`;
-  } finally { btn.disabled = false; }
+  } finally { clearTimeout(slow); btn.disabled = false; }
 }));
 
 // ---------- 圖表 ----------

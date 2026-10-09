@@ -16,7 +16,8 @@
   <aside class="nav">
     <div class="brand"><span class="logo">台</span><div><b>台股交易研究室</b><small>Automated TW Equity Research</small></div></div>
     <nav id="menu">
-      <a data-tab="ideas" class="active"><i>01</i>交易點子生成器</a>
+      <a data-tab="beginner" class="active"><i>★</i>新手模式</a>
+      <a data-tab="ideas"><i>01</i>交易點子生成器</a>
       <a data-tab="technical"><i>02</i>自動化技術分析</a>
       <a data-tab="news"><i>03</i>新聞轉交易策略</a>
       <a data-tab="backtest"><i>04</i>策略回測分析</a>
@@ -33,7 +34,23 @@
 
   <main>
     <!-- 1 -->
-    <section id="tab-ideas" class="tab active">
+    <!-- 0 新手模式 -->
+    <section id="tab-beginner" class="tab active">
+      <header><h1>新手模式</h1><p>只要告訴我「有多少錢」和「最多能接受虧多少」，系統會判斷大盤能不能買、挑出 3 檔候選股，並算出每檔該買幾股、最多會虧多少。</p></header>
+      <form class="bar wrap" data-api="beginner">
+        <label class="field">我的資金（元）<input name="capital" type="number" class="sm" value="100000" min="10000" step="10000"></label>
+        <label class="field">我能接受的風險
+          <select name="profile">
+            <option value="保守">保守：每筆最多虧總資金 0.5%</option>
+            <option value="穩健" selected>穩健：每筆最多虧總資金 1%</option>
+            <option value="積極">積極：每筆最多虧總資金 2%</option>
+          </select></label>
+        <button>幫我找</button>
+      </form>
+      <div class="out"><div class="card"><h2>怎麼用？</h2><ol class="reasons"><li>輸入您能拿來投資的<b>閒錢</b>（不會影響生活的錢）。</li><li>選擇風險：不確定就選「穩健」。</li><li>按「幫我找」，系統會依序檢查<b>大盤</b>、<b>個股走勢</b>、<b>價格是否太貴</b>、<b>近期新聞</b>，再算出買幾股。</li></ol><p class="muted small">本系統為研究輔助工具，不是投資建議，投資一定有虧損風險。</p></div></div>
+    </section>
+
+    <section id="tab-ideas" class="tab">
       <header><h1>交易點子生成器</h1><p>掃描今日市場，針對指定股票／指數／產業產生五組高勝率交易機會，含進場、出場目標、停損、風險報酬比，以及技術面與基本面理由。</p></header>
       <form class="bar" data-api="ideas">
         <input name="target" list="industryList" placeholder="例：半導體、航運、加權指數、2330,2317,2454" value="加權指數">

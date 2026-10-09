@@ -284,3 +284,70 @@ RENDER.plan.after = (d, out) => {
   });
   update();
 };
+
+// ---------- 0. 新手模式 ----------
+const money = (x) => `${num(x, 0)} 元`;
+const GLOSSARY = [
+  ['停損', '先決定「跌到哪個價格就認賠賣掉」。它的目的是避免小虧變大虧，是新手最重要的保命習慣。'],
+  ['目標價', '預計賣出獲利的價位。到達後可以賣掉，或賣一半、另一半繼續持有。'],
+  ['風險報酬比 1:2', '最多虧 1 元，預期可賺 2 元。就算只有一半的交易賺錢，整體仍然會獲利。'],
+  ['零股', '不足 1 張（1000 股）的股數。資金不多時可以用零股買，盤中 9:00–13:30 即可交易。'],
+  ['均線（月線／季線）', '過去 20 天（月線）或 60 天（季線）的平均價格。股價在季線之上，代表中期走勢向上。'],
+  ['RSI', '衡量短線漲得過不過熱的指標。70 以上代表短期漲多了，容易回檔；30 以下代表跌多了。'],
+  ['本益比', '股價是每年每股盈餘的幾倍。越高代表越貴；沒有本益比通常是公司近期虧損。'],
+  ['ETF', '一籃子股票組成的基金，像買一整包。例如 0050 就是一次買台灣市值最大的 50 家公司，分散風險。'],
+  ['最大回撤', '過去一段時間內，從最高點跌到最低點的幅度。它告訴您「最慘的時候會虧多少」。'],
+];
+RENDER.beginner = (d) => {
+  const m = d.market;
+  const lvlClass = { bull: 'up', range: '', bear: 'down' }[m.level];
+  return `
+  <div class="card temp ${m.level}">
+    <div class="big ${lvlClass}">大盤：${m.label}</div>
+    <div><b>${esc(m.text)}</b><div class="small muted">${m.facts.map(esc).join('・')}</div></div>
+  </div>
+  <div class="kpis">${kpi('我的資金', money(d.capital))}${kpi('風險設定', esc(d.profile), esc(d.profileDesc))}${kpi('預計投入', money(d.totals.cost), `佔資金 ${num(d.totals.cost / d.capital * 100, 0)}%`)}${kpi('全部停損最多虧', money(d.totals.maxLoss), `佔資金 ${num(d.totals.maxLoss / d.capital * 100, 1)}%`, 'down')}</div>
+
+  <h2 style="margin:18px 0 8px">${m.factor === 0 ? '觀察名單（目前不建議買進）' : '今日候選股'}</h2>
+  <div class="muted small" style="margin-bottom:10px">從股本前 ${d.scannedCount} 大公司中，${d.qualified} 檔通過走勢篩選，再檢查近期新聞，挑出最適合的 ${d.picks.length} 檔。</div>
+  ${d.picks.length ? '' : '<div class="card muted">目前沒有通過篩選的股票。沒有好機會時，空手也是一種策略。</div>'}
+  ${d.picks.map((p, k) => `
+    <div class="card pick ${d.market.factor === 0 ? 'watch' : ''}">
+      <div class="title"><div><span class="muted mono">#${k + 1}</span> <b>${esc(p.name)}</b> <span class="muted mono">${esc(p.code)}</span> <span class="muted small">${esc(p.industry || '')}</span></div>
+        <div class="mono">現價 <b class="${cls(p.change)}">${num(p.price)}</b> <span class="${cls(p.change)}">${pct(p.change)}</span></div></div>
+      ${p.watchOnly ? '<div class="warn-box small">大盤目前偏弱，下列數字只供參考，建議先觀察不要買。</div>' : p.affordable ? `
+      <div class="action">
+        <div class="row"><span>① 買進價（約）</span><span class="big">${num(p.entry)}</span></div>
+        <div class="row"><span>② 買進股數</span><span class="big">${num(p.shares, 0)} 股${p.lots ? `（${p.lots} 張${p.oddShares ? ` + ${p.oddShares} 股零股` : ''}）` : '（零股）'}</span></div>
+        <div class="row"><span>③ 需要的錢</span><span class="big">${money(p.cost)}</span></div>
+        <div class="row"><span>④ 跌到這裡就賣（停損）</span><span class="big down">${num(p.stop)}（-${p.stopPct}%）</span></div>
+        <div class="row"><span>⑤ 漲到這裡可以賣（目標）</span><span class="big up">${num(p.target)}（+${p.targetPct}%）</span></div>
+        <div class="row"><span>最壞情況虧損</span><span class="big down">約 ${money(p.maxLoss)}</span></div>
+        <div class="row"><span>達到目標賺</span><span class="big up">約 ${money(p.maxGain)}</span></div>
+      </div>` : '<div class="warn-box small">以您目前的資金與風險設定，這檔買不到 1 股（價格太高或風險額度太小），可以改選其他檔。</div>'}
+      ${p.resistanceNote ? `<div class="small muted">💡 ${esc(p.resistanceNote)}</div>` : ''}
+      <h3>為什麼挑這檔？</h3>
+      <ul class="reasons">${p.reasons.map((t) => `<li>${esc(t)}</li>`).join('')}</ul>
+      <h3>五項體檢</h3>
+      ${p.checks.map((c) => `<div class="chk ${c.ok ? 'ok' : 'no'}"><span class="m">${c.ok ? '✓' : '✗'}</span><span><b>${esc(c.label)}</b>　<span class="muted small">${esc(c.plain)}</span></span></div>`).join('')}
+      <div class="chk ${p.news?.negative >= 2 ? 'no' : 'ok'}"><span class="m">${p.news?.negative >= 2 ? '!' : '✓'}</span><span><b>近期新聞</b>　<span class="muted small">${p.news?.unknown ? '暫時無法取得新聞' : `近 14 天 ${p.news?.count} 則，其中偏負面 ${p.news?.negative} 則`}</span></span></div>
+      <div class="small muted" style="margin-top:8px">過去一年這檔漲跌 ${pct(p.stats.ret, 1)}，期間最大回撤 ${p.stats.mdd}%（最慘時從高點跌了這麼多）。</div>
+    </div>`).join('')}
+  ${d.excluded.length ? `<div class="card"><h3>已排除</h3>${d.excluded.map((x) => `<div class="small">${esc(x.name)}（${esc(x.code)}）：${esc(x.reason)}</div>`).join('')}</div>` : ''}
+
+  <div class="card"><h2>更穩的選擇：ETF</h2><p class="muted small">不想自己選股的新手，ETF 一次買一籃子股票，風險比單一股票低。可以用「定期定額」每月固定買一點。</p>
+    <div class="tbl-wrap"><table><tr><th>ETF</th><th class="n">現價</th><th>走勢</th><th class="n">近一年</th><th class="n">最大回撤</th><th>特色</th></tr>
+    ${d.etfs.map((e) => `<tr><td><b>${esc(e.name)}</b><br><span class="muted small mono">${e.code}</span></td><td class="n">${num(e.price)}</td><td class="${e.trend === '向上' ? 'up' : e.trend === '向下' ? 'down' : ''}">${e.trend}</td><td class="n ${cls(e.ret1y)}">${pct(e.ret1y, 1)}</td><td class="n down">${e.mdd1y}%</td><td class="small">${esc(e.note)}<br><span class="muted">1 張約 ${money(e.oneLot)}，可買零股</span></td></tr>`).join('')}</table></div></div>
+
+  <div class="card"><h2>新手五大守則</h2><ol class="reasons">
+    <li><b>只用閒錢。</b>不要借錢、不要動用生活費。</li>
+    <li><b>一定要設停損，而且真的執行。</b>賣掉一檔虧損，比抱到腰斬好。</li>
+    <li><b>不要把錢全押在一檔。</b>系統已限制單檔上限為資金的 ${d.maxPos * 100}%。</li>
+    <li><b>大盤偏弱就空手。</b>沒有機會時不交易，也是一種策略。</li>
+    <li><b>先小額練習。</b>用小金額熟悉流程，再逐步增加。</li>
+  </ol></div>
+
+  <details class="card gloss"><summary style="cursor:pointer;font-weight:700">看不懂的名詞？點這裡看白話解釋</summary><dl>${GLOSSARY.map(([t, x]) => `<dt>${esc(t)}</dt><dd>${esc(x)}</dd>`).join('')}</dl></details>
+  ${aiBlock(d.ai)}
+  <div class="card muted small">本系統為研究輔助工具，所有內容不構成投資建議。技術分析是機率，不保證獲利，請自行判斷並承擔風險。</div>`;
+};

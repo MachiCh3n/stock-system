@@ -103,6 +103,24 @@ code { font-family: var(--mono); background: var(--panel2); padding: 1px 6px; bo
 a { color: var(--info); }
 main { min-width: 0; }
 
+/* ---------- 新手模式 ---------- */
+.field { display: flex; flex-direction: column; gap: 3px; font-size: 12px; color: var(--muted); }
+.temp { display: flex; gap: 14px; align-items: center; border-left: 4px solid var(--muted); }
+.temp.bull { border-left-color: var(--up); } .temp.range { border-left-color: var(--warn); } .temp.bear { border-left-color: var(--down); }
+.temp .big { font-size: 26px; font-weight: 700; white-space: nowrap; }
+.pick { border-left: 3px solid var(--accent); }
+.pick.watch { border-left-color: var(--muted); opacity: .9; }
+.pick .title { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.pick .title b { font-size: 18px; }
+.action { background: var(--panel2); border-radius: 10px; padding: 12px 14px; margin: 12px 0; }
+.action .row { display: flex; justify-content: space-between; gap: 10px; padding: 4px 0; border-bottom: 1px dashed var(--line); }
+.action .row:last-child { border: 0; }
+.action .big { font-family: var(--mono); font-weight: 700; font-size: 17px; }
+.chk { display: flex; gap: 8px; padding: 3px 0; align-items: baseline; }
+.chk .m { width: 18px; flex: none; font-weight: 700; } .chk.ok .m { color: var(--up); } .chk.no .m { color: var(--down); }
+.gloss dt { font-weight: 700; margin-top: 10px; } .gloss dd { margin: 2px 0 0; color: var(--muted); }
+.warn-box { background: rgba(245,158,11,.1); border: 1px solid rgba(245,158,11,.4); border-radius: 10px; padding: 10px 14px; margin-top: 10px; }
+
 /* ---------- 平板 ---------- */
 @media (max-width: 1100px) {
   .g3 { grid-template-columns: 1fr; }
@@ -165,6 +183,8 @@ main { min-width: 0; }
   table.stack-sm tr { padding: 8px 0; border-bottom: 1px solid var(--line); }
   table.stack-sm td { border: 0; padding: 2px 0; }
 
+  .field { flex: 1 1 100%; } .field input, .field select { width: 100%; }
+  .temp { flex-direction: column; align-items: flex-start; gap: 4px; }
   .checklist .item { grid-template-columns: 22px 46px minmax(0, 1fr); gap: 8px; padding: 10px 0; }
   .steps li { padding-left: 34px; }
   .rule { padding: 10px; gap: 10px; }

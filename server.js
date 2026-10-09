@@ -10,6 +10,7 @@ import { backtestReport, STRATEGIES } from './lib/backtest.js';
 import { portfolioReport } from './lib/portfolio.js';
 import { journalReport } from './lib/journal.js';
 import { dailyPlan } from './lib/plan.js';
+import { beginnerReport } from './lib/beginner.js';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
@@ -42,6 +43,7 @@ app.get('/api/meta', async (_req, res) => {
     strategies: Object.entries(STRATEGIES).map(([key, s]) => ({ key, name: s.name, params: s.params, desc: s.desc(s.params) })),
   });
 });
+app.post('/api/beginner', handle((b) => beginnerReport({ capital: Number(b.capital) || 100000, profile: b.profile }, { withAI: ai(b) })));
 app.post('/api/ideas', handle((b) => generateIdeas(b.target, { withAI: ai(b) })));
 app.post('/api/technical', handle((b) => technicalReport(b.symbol, { withAI: ai(b) })));
 app.post('/api/news', handle((b) => newsStrategy(b.query, { withAI: ai(b), capital: Number(b.capital) || 1_000_000 })));

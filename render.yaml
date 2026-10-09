@@ -1,0 +1,15 @@
+# Render 部署設定：在 Render 選擇「New → Blueprint」並連結此儲存庫即可部署
+services:
+  - type: web
+    name: stock-system
+    runtime: node
+    plan: free
+    region: singapore
+    buildCommand: npm ci
+    startCommand: npm start
+    healthCheckPath: /healthz
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      # 若要啟用 Claude AI 解讀，部署後到 Render 的 Environment 頁面新增 ANTHROPIC_API_KEY
+      # （注意：公開網站的所有訪客都會使用到此金鑰的額度）

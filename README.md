@@ -20,6 +20,14 @@ npm start
 
 預設模型為 `claude-opus-5-5`，可用 `CLAUDE_MODEL` 環境變數更換。未設定金鑰時，所有量化分析仍可正常使用。
 
+## 部署到 Render（取得公開網址）
+
+1. 以 GitHub 帳號登入 [Render](https://render.com)
+2. 選擇 **New → Blueprint**，連結本儲存庫，Render 會讀取 `render.yaml` 自動建立服務
+3. 部署完成後取得 `https://stock-system-xxxx.onrender.com` 網址
+
+免費方案閒置 15 分鐘後會休眠，再次開啟需等候約 30–60 秒。若要啟用 AI 解讀，請在 Render 的 Environment 頁面新增 `ANTHROPIC_API_KEY`（公開網站的所有訪客都會使用此金鑰額度）。
+
 ## 模組
 
 | # | 模組 | 輸入 | 輸出 |

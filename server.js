@@ -34,6 +34,7 @@ const handle = (fn) => async (req, res) => {
 };
 const ai = (b) => b.ai !== false && aiEnabled();
 
+app.get('/healthz', (_req, res) => res.send('ok'));
 app.get('/api/meta', async (_req, res) => {
   res.json({
     ai: aiEnabled(),

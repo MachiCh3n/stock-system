@@ -1,7 +1,7 @@
 import express from 'express';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { listIndustries } from './lib/data.js';
+import { listIndustries, getUniverse } from './lib/data.js';
 import { aiEnabled } from './lib/ai.js';
 import { generateIdeas } from './lib/ideas.js';
 import { technicalReport } from './lib/analysis.js';
@@ -54,4 +54,6 @@ const PORT = Number(process.env.PORT) || 3000;
 app.listen(PORT, () => {
   console.log(`台股交易研究系統：http://localhost:${PORT}`);
   console.log(aiEnabled() ? 'Claude AI 解讀：已啟用' : 'Claude AI 解讀：未啟用（設定 ANTHROPIC_API_KEY 後重啟即可啟用）');
+  // 啟動時預先載入上市櫃清單，避免第一位訪客等待
+  getUniverse().then((u) => console.log(`已載入 ${u.size} 檔證券資料`)).catch((e) => console.error('預載證券清單失敗：', e.message));
 });

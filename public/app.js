@@ -46,7 +46,9 @@ try { const t = localStorage.getItem('tab'); if (t) $(`#menu a[data-tab="${t}"]`
 let STRATS = [];
 function loadMeta() { return request('meta').then((m) => {
   $('#aiStatus').innerHTML = m.ai ? '✓ 已連接 Claude API' : '未設定 ANTHROPIC_API_KEY，僅顯示量化分析';
-  if (!m.ai) { $('#aiToggle').checked = false; $('#aiToggle').disabled = true; }
+  // 確認伺服器有 Claude 金鑰後才開放 AI 開關
+  $('#aiToggle').disabled = !m.ai;
+  $('#aiToggle').checked = m.ai;
   $('#industryList').innerHTML = m.industries.map((i) => `<option value="${esc(i.name)}">`).join('');
   $('#industryChips').innerHTML = ['加權指數', '櫃買', ...m.industries.slice(0, 14).map((i) => i.name)].map((n) => `<span class="chip">${esc(n)}</span>`).join('');
   $$('#industryChips .chip').forEach((c) => c.addEventListener('click', () => { $('#tab-ideas input[name=target]').value = c.textContent; $('#tab-ideas form').requestSubmit(); }));
